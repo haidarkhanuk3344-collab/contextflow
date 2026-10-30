@@ -123,7 +123,7 @@ export function Studio({ initial, onBack }: { initial: Project; onBack: () => vo
       const blob = await response.blob();
       if (!blob.size || !/^(image|video)\//.test(blob.type)) throw new Error('结果文件不可用');
       const href = URL.createObjectURL(blob); const a = document.createElement('a');
-      const ext = blob.type.startsWith('video/') ? 'mp4' : blob.type.includes('jpeg') ? 'jpg' : blob.type.split('/')[1];
+      const ext = blob.type.startsWith('video/') ? (blob.type.includes('webm') ? 'webm' : 'mp4') : blob.type.includes('jpeg') ? 'jpg' : blob.type.split('/')[1];
       a.href = href; a.download = `镜流-${task.id}.${ext}`; a.click(); setTimeout(() => URL.revokeObjectURL(href), 1000);
     } catch (e) { setNotice((e as Error).message); }
     finally { locks.current.delete(key); setBusy(v => v.filter(id => id !== key)); }

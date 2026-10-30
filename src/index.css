@@ -82,3 +82,5 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.demo-badge{position:fixed;bottom:14px;right:20px;z-index:1000;padding:7px 12px;border:1px solid #454545;border-radius:20px;background:#202020;color:#bfbfbf;font-size:12px;pointer-events:none}

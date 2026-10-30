@@ -6,3 +6,4 @@ data/
 *.log
 *.bak
 .DS_Store
+!.env.demo

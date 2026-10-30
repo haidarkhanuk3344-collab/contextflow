@@ -9,6 +9,7 @@ import './App.css';
 import './studio.css';
 import './v1/ui.css';
 
+const demo = import.meta.env?.VITE_DEMO === 'true';
 export default function App() {
   const [user, setUser] = useState<{ id: string; name: string; role?: string } | null>(null);
   const [ready, setReady] = useState(false); const [error, setError] = useState('');
@@ -44,8 +45,8 @@ export default function App() {
   return <div className="home-shell v1-home"><aside className="home-sidebar"><Logo /><nav aria-label="主导航">
     <button className={tab === 'home' ? 'active' : ''} onClick={() => setTab('home')}><Home size={18} />首页</button>
     <button className={tab === 'projects' ? 'active' : ''} onClick={() => setTab('projects')}><FolderOpen size={18} />项目</button>
-    </nav><button className="v1-account" onClick={async () => { try { await api.logout(); setUser(null); setProjects([]); } catch (e) { setError((e as Error).message); } }} title="退出登录"><span>{user.name}</span><LogOut size={16} /></button></aside>
-    <main className="home-main"><header className="home-header"><h1>{tab === 'home' ? '工作空间' : '项目'}</h1>{user.role !== 'admin' && <button className="text-button" onClick={() => { setAdminMode(true); setUser(null); setError(''); window.location.hash = '/admin'; }}>管理员入口</button>}{user.role === 'admin' && <button className="text-button" onClick={async () => { try { setNewInvite((await api.invite()).inviteToken); } catch (e) { setError((e as Error).message); } }}>生成邀请码</button>}<label className="home-search"><Search size={16}/><input aria-label="搜索项目" placeholder="搜索项目" value={search} onChange={e => setSearch(e.target.value)} /></label></header>
+    </nav><button disabled={demo} className="v1-account" onClick={async () => { try { await api.logout(); setUser(null); setProjects([]); } catch (e) { setError((e as Error).message); } }} title="退出登录"><span>{user.name}</span><LogOut size={16} /></button></aside>
+    <main className="home-main"><header className="home-header"><h1>{tab === 'home' ? '工作空间' : '项目'}</h1>{!demo && user.role !== 'admin' && <button className="text-button" onClick={() => { setAdminMode(true); setUser(null); setError(''); window.location.hash = '/admin'; }}>管理员入口</button>}{user.role === 'admin' && <button className="text-button" onClick={async () => { try { setNewInvite((await api.invite()).inviteToken); } catch (e) { setError((e as Error).message); } }}>生成邀请码</button>}<label className="home-search"><Search size={16}/><input aria-label="搜索项目" placeholder="搜索项目" value={search} onChange={e => setSearch(e.target.value)} /></label></header>
     <div className="home-content">{newInvite && <div className="v1-error" role="status"><span>邀请码：{newInvite}</span><button onClick={() => setNewInvite('')}>关闭</button></div>}{error && <div className="v1-error" role="alert">{error}<button onClick={() => void load()}>重试</button></div>}
       {tab === 'home' && <><button disabled={busy} className="v1-create" onClick={() => void create()}><Plus size={30}/><span>新建画布</span></button><div className="v1-shortcuts"><button disabled={busy} onClick={() => void create('image')}><ImagePlus size={22}/>图片生成</button><button disabled={busy} onClick={() => void create('video')}><Video size={22}/>视频生成</button></div></>}
       <section><div className="section-heading"><h2>{tab === 'home' ? '最近项目' : '全部项目'}</h2><button className="text-button" disabled={busy} onClick={() => void create()}><Plus size={16}/>新建项目</button></div>

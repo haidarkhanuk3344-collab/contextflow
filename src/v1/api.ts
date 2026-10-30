@@ -2,6 +2,7 @@ import { decodeProject, normalizeAsset } from './model';
 import type { Asset, Category, Capabilities, Project, Style, Summary, Task } from './model';
 export class ApiError extends Error { status: number; code: string; constructor(message: string, status: number, code: string) { super(message); this.status = status; this.code = code; } }
 export async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
+  if (import.meta.env?.VITE_DEMO === 'true') return (await import('./demo')).demoRequest<T>(path, method, body);
   let response: Response;
   try { response = await fetch(`/api/v1${path}`, { method, credentials: 'same-origin', headers: body === undefined ? undefined : { 'Content-Type': 'application/json' }, ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: AbortSignal.timeout(20000) }); }
   catch { throw new ApiError('连接中断，请重试', 0, 'NETWORK'); }

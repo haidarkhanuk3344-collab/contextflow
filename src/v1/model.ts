@@ -22,8 +22,20 @@ export type Capabilities = {
 };
 export type Style = { id: string; name: string; description?: string };
 export const blankData = (kind: Kind, name: string): NodeData => ({ name, kind, userInput: '', modelId: '', parameters: {}, style: { presetId: null, customDescription: null }, mediaReferences: [], context: { enabled: false, sourceNodeId: null, sourceVersionId: null }, adoptedVersionId: null });
+const demoMediaUrls = new Map<string, string>();
 export function mediaUrl(value?: string): string | undefined {
   if (!value) return undefined;
+  if (import.meta.env?.VITE_DEMO === 'true') {
+    if (value.startsWith('blob:') && [...demoMediaUrls.values()].includes(value)) return value;
+    if (/^data:(image\/(png|jpeg|webp)|video\/(mp4|webm));base64,[A-Za-z0-9+/=]+$/.test(value)) {
+      if (!demoMediaUrls.has(value)) {
+        const [header, encoded] = value.split(',');
+        const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+        demoMediaUrls.set(value, URL.createObjectURL(new Blob([bytes], { type: header.slice(5, -7) })));
+      }
+      return demoMediaUrls.get(value);
+    }
+  }
   if (value.startsWith('/api/v1/assets/') && !value.includes('\\')) return value;
   try { const url = new URL(value); return url.protocol === 'https:' ? url.href : undefined; } catch { return undefined; }
 }
